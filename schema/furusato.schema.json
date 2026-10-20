@@ -1,0 +1,194 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ふるさと納税 収支マップ データ契約",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["metadata", "entities"],
+  "properties": {
+    "metadata": { "$ref": "#/$defs/metadata" },
+    "entities": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/entity" }
+    }
+  },
+  "$defs": {
+    "nonNegativeIntegerOrNull": {
+      "type": ["integer", "null"],
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "balanceYen": {
+      "type": ["integer", "null"],
+      "minimum": -9007199254740991,
+      "maximum": 9007199254740991
+    },
+    "text": { "type": "string", "minLength": 1 },
+    "costBreakdown": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "procurementYen", "shippingYen", "advertisingYen",
+        "settlementYen", "administrationYen", "otherYen"
+      ],
+      "properties": {
+        "procurementYen": { "$ref": "#/$defs/nonNegativeIntegerOrNull" },
+        "shippingYen": { "$ref": "#/$defs/nonNegativeIntegerOrNull" },
+        "advertisingYen": { "$ref": "#/$defs/nonNegativeIntegerOrNull" },
+        "settlementYen": { "$ref": "#/$defs/nonNegativeIntegerOrNull" },
+        "administrationYen": { "$ref": "#/$defs/nonNegativeIntegerOrNull" },
+        "otherYen": { "$ref": "#/$defs/nonNegativeIntegerOrNull" }
+      }
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["url", "retrievedOn", "sha256"],
+      "properties": {
+        "url": { "type": "string", "format": "uri", "pattern": "^https://" },
+        "retrievedOn": {
+          "type": "string",
+          "format": "date",
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+        },
+        "sha256": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schemaVersion", "sources", "units", "periods", "rounding", "notes"],
+      "properties": {
+        "schemaVersion": { "const": 2 },
+        "sources": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["receipts", "history", "deductions", "population", "ordinaryGrant", "ordinaryGrantSummary"],
+          "properties": {
+            "receipts": { "$ref": "#/$defs/source" },
+            "history": { "$ref": "#/$defs/source" },
+            "deductions": { "$ref": "#/$defs/source" },
+            "population": { "$ref": "#/$defs/source" },
+            "ordinaryGrant": { "$ref": "#/$defs/source" },
+            "ordinaryGrantSummary": { "$ref": "#/$defs/source" }
+          }
+        },
+        "units": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["money", "count", "population", "taxpayer"],
+          "properties": {
+            "money": { "const": "JPY" },
+            "count": { "const": "件" },
+            "population": { "const": "人" },
+            "taxpayer": { "const": "人" }
+          }
+        },
+        "periods": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["receipts", "history", "deductions", "population", "ordinaryGrant"],
+          "properties": {
+            "receipts": { "$ref": "#/$defs/text" },
+            "history": { "$ref": "#/$defs/text" },
+            "deductions": { "$ref": "#/$defs/text" },
+            "population": { "$ref": "#/$defs/text" },
+            "ordinaryGrant": { "$ref": "#/$defs/text" }
+          }
+        },
+        "rounding": { "const": "ROUND_HALF_UP" },
+        "notes": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["periodMismatch", "excludedAdjustments", "attribution"],
+          "properties": {
+            "periodMismatch": { "$ref": "#/$defs/text" },
+            "excludedAdjustments": { "$ref": "#/$defs/text" },
+            "attribution": { "$ref": "#/$defs/text" }
+          }
+        }
+      }
+    },
+    "historyPoint": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["fiscalYear", "receiptAmountYen"],
+      "properties": {
+        "fiscalYear": { "type": "integer", "minimum": 2008, "maximum": 2025 },
+        "receiptAmountYen": { "$ref": "#/$defs/nonNegativeIntegerOrNull" }
+      }
+    },
+    "entity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "code", "kind", "prefName", "name", "receiptAmountYen", "receiptCount",
+        "proxyReceiptAmountYen", "solicitationCostYen", "residentTaxDeductionYen",
+        "primaryBalanceYen", "referenceBalanceYen", "history", "population",
+        "ordinaryGrantStatus", "solicitationCostBreakdown", "portalCostBreakdown",
+        "portalCostYen", "deductionUserCount", "deductionDonationAmountYen"
+      ],
+      "properties": {
+        "code": {
+          "type": "string",
+          "minLength": 6,
+          "maxLength": 6,
+          "pattern": "^[0-9]{6}$"
+        },
+        "kind": { "enum": ["prefecture", "municipality"] },
+        "prefName": { "$ref": "#/$defs/text" },
+        "name": { "$ref": "#/$defs/text" },
+        "receiptAmountYen": { "$ref": "#/$defs/nonNegativeIntegerOrNull" },
+        "receiptCount": { "$ref": "#/$defs/nonNegativeIntegerOrNull" },
+        "proxyReceiptAmountYen": { "$ref": "#/$defs/nonNegativeIntegerOrNull" },
+        "solicitationCostYen": { "$ref": "#/$defs/nonNegativeIntegerOrNull" },
+        "residentTaxDeductionYen": {
+          "$ref": "#/$defs/nonNegativeIntegerOrNull",
+          "description": "municipalityはBE列の市町村民税、prefectureは県内市区町村のBH列の道府県民税を各行で丸めた後の合計。"
+        },
+        "primaryBalanceYen": {
+          "$ref": "#/$defs/balanceYen",
+          "description": "receiptAmountYen - residentTaxDeductionYen。必要値の欠測時はnull。"
+        },
+        "referenceBalanceYen": {
+          "$ref": "#/$defs/balanceYen",
+          "description": "receiptAmountYen - solicitationCostYen - residentTaxDeductionYen。必要値の欠測時はnull。"
+        },
+        "population": {
+          "$ref": "#/$defs/nonNegativeIntegerOrNull",
+          "description": "2026年1月1日の住民基本台帳人口（日本人と外国人の総計）。県は県人口。"
+        },
+        "ordinaryGrantStatus": {
+          "enum": ["receiving", "non_receiving", "tokyo_special_ward", "unknown"],
+          "description": "令和8年度当初の普通交付税の状態。資料にない団体を交付扱いにしない。"
+        },
+        "solicitationCostBreakdown": { "$ref": "#/$defs/costBreakdown" },
+        "portalCostBreakdown": { "$ref": "#/$defs/costBreakdown" },
+        "portalCostYen": {
+          "$ref": "#/$defs/nonNegativeIntegerOrNull",
+          "description": "受入ExcelのY列。ポータル事業者への支払額の合計（募集費用の内数）。"
+        },
+        "deductionUserCount": {
+          "$ref": "#/$defs/nonNegativeIntegerOrNull",
+          "description": "市区町村は控除ExcelのBC列（人）。県は県内市区町村BCの和。BFは足さない。"
+        },
+        "deductionDonationAmountYen": {
+          "$ref": "#/$defs/nonNegativeIntegerOrNull",
+          "description": "市区町村は控除ExcelのBD列（円）。県は県内市区町村BDの和。"
+        },
+        "history": {
+          "type": ["array", "null"],
+          "minItems": 18,
+          "maxItems": 18,
+          "items": { "$ref": "#/$defs/historyPoint" },
+          "description": "2008～2025年度の昇順。年度別欠測は金額をnull、名寄せ不能・曖昧・全年度欠測なら配列全体をnull。"
+        }
+      }
+    }
+  }
+}

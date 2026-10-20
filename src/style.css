@@ -1,0 +1,1129 @@
+:root {
+  --bg: #ffffff;
+  --ink: #161a22;
+  --ink-2: #4a5160;
+  --ink-3: #7a8190;
+  --line: #e2e6ee;
+  --accent: #1d5fd6;
+  --accent-ink: #1650b8;
+  --tile: #e9f0fd;
+  --tile-hover: #d6e3fb;
+  --mine: #f1f6ff;
+  --font: "BIZ UDPGothic", system-ui, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font: 16px/1.7 var(--font);
+  font-variant-numeric: tabular-nums;
+}
+
+a {
+  color: var(--accent-ink);
+}
+
+.wrap {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 32px;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* ── ヘッダー ── */
+
+.site-header {
+  border-bottom: 1px solid var(--line);
+}
+
+.header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  height: 68px;
+}
+
+.logo {
+  color: var(--accent);
+  font-size: 1.5rem;
+  font-weight: 700;
+  text-decoration: none;
+  letter-spacing: 0.02em;
+}
+
+.nav {
+  display: flex;
+  gap: 32px;
+}
+
+.nav a {
+  color: var(--ink-2);
+  text-decoration: none;
+  font-size: 0.95rem;
+}
+
+.nav a:hover {
+  color: var(--ink);
+}
+
+/* ── 最初の画面 ── */
+
+.hero {
+  padding: 56px 0 40px;
+}
+
+h1 {
+  margin: 0;
+  font-size: 2.6rem;
+  line-height: 1.3;
+  letter-spacing: 0.01em;
+}
+
+.lead {
+  margin: 12px 0 28px;
+  color: var(--ink-2);
+  font-size: 1.15rem;
+}
+
+.quick {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin: 18px 0 0;
+  color: var(--ink-3);
+  font-size: 0.95rem;
+}
+
+.quick a {
+  padding: 6px 16px;
+  border-radius: 6px;
+  background: var(--tile);
+  color: var(--accent-ink);
+  text-decoration: none;
+}
+
+.quick a:hover {
+  background: var(--tile-hover);
+}
+
+/* ── 検索 ── */
+
+.search {
+  position: relative;
+  display: flex;
+  gap: 12px;
+  max-width: 900px;
+}
+
+.search input {
+  flex: 1;
+  min-width: 0;
+  height: 52px;
+  padding: 0 18px;
+  border: 1.5px solid #b9c6dd;
+  border-radius: 6px;
+  font: inherit;
+  font-size: 1.05rem;
+  color: var(--ink);
+}
+
+.search input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(29, 95, 214, 0.15);
+}
+
+.search-lg input {
+  height: 64px;
+  font-size: 1.15rem;
+}
+
+.btn-primary {
+  flex: none;
+  padding: 0 32px;
+  border: 0;
+  border-radius: 6px;
+  background: var(--accent);
+  color: #fff;
+  font: inherit;
+  font-weight: 700;
+  font-size: 1.05rem;
+  cursor: pointer;
+}
+
+.btn-primary:hover {
+  background: var(--accent-ink);
+}
+
+.suggest {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  z-index: 10;
+  margin: 0;
+  padding: 6px 0;
+  list-style: none;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  box-shadow: 0 8px 24px rgba(20, 30, 50, 0.1);
+}
+
+.suggest a {
+  display: flex;
+  gap: 12px;
+  padding: 10px 18px;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.suggest a:hover,
+.suggest a:focus {
+  background: var(--mine);
+  outline: none;
+}
+
+.sg-pref {
+  min-width: 5em;
+  color: var(--ink-3);
+}
+
+.sg-none {
+  padding: 10px 18px;
+  color: var(--ink-3);
+}
+
+.top-search {
+  padding: 24px 0 8px;
+}
+
+/* ── 節 ── */
+
+.section {
+  padding: 40px 0;
+  border-top: 1px solid var(--line);
+}
+
+.hero + .section {
+  border-top: 0;
+  padding-top: 8px;
+}
+
+h2 {
+  margin: 0 0 20px;
+  font-size: 1.5rem;
+}
+
+h3 {
+  margin: 0 0 8px;
+  font-size: 1.1rem;
+}
+
+/* ── 地図 ── */
+
+.map-wrap {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 200px;
+  gap: 32px;
+  align-items: start;
+}
+
+.map {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 640px;
+}
+
+/* 全国の地図は大きく（横幅いっぱい・画面の高さの9割まで） */
+.map-japan {
+  max-height: max(560px, 90vh);
+  margin: 0 auto;
+}
+
+.map path {
+  stroke: #3b4558;
+  stroke-width: 1;
+  stroke-linejoin: round;
+  transition: fill 0.15s;
+}
+
+.map-pref path {
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+.map path {
+  vector-effect: non-scaling-stroke;
+}
+
+.map a:hover path,
+.map a:focus-visible path {
+  stroke: #000;
+  stroke-width: 3;
+}
+
+.map-pref a:hover path,
+.map-pref a:focus-visible path {
+  stroke-width: 3;
+}
+
+.map a:focus {
+  outline: none;
+}
+
+.map path.is-current {
+  stroke: #000;
+  stroke-width: 3;
+}
+
+.map .inset {
+  fill: none;
+  stroke: #c3ccdb;
+  stroke-width: 0.8;
+  stroke-dasharray: 3 2;
+}
+
+.legend {
+  font-size: 0.9rem;
+}
+
+.legend-end {
+  margin: 0;
+  color: var(--ink-2);
+  font-size: 0.82rem;
+}
+
+.legend ul {
+  margin: 4px 0;
+  padding: 0;
+  list-style: none;
+}
+
+.legend li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 3px 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.sw {
+  flex: none;
+  display: inline-block;
+  width: 18px;
+  height: 14px;
+  border-radius: 3px;
+}
+
+.legend-note {
+  margin: 12px 0 0;
+  color: var(--ink-2);
+  font-size: 0.85rem;
+  line-height: 1.6;
+}
+
+.map-outside {
+  margin-top: 12px;
+  font-size: 0.9rem;
+}
+
+.map-outside p {
+  margin: 0 0 6px;
+  color: var(--ink-3);
+}
+
+.map-outside ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.map-outside a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.map-outside a:hover {
+  text-decoration: underline;
+}
+
+.map-label {
+  position: fixed;
+  z-index: 60;
+  padding: 6px 10px;
+  border-radius: 6px;
+  background: var(--ink);
+  color: #fff;
+  font-size: 0.88rem;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.pref-select {
+  display: none;
+}
+
+/* ── 用語の説明 ── */
+
+.term {
+  position: relative;
+  text-decoration: underline dotted;
+  text-decoration-color: #8a97ad;
+  text-underline-offset: 4px;
+  cursor: help;
+}
+
+.term:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+.tip {
+  position: fixed;
+  z-index: 50;
+  display: none;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 10px 28px rgba(20, 30, 50, 0.14);
+  color: var(--ink);
+  font-size: 0.92rem;
+  font-weight: 400;
+  line-height: 1.65;
+  text-align: left;
+  white-space: normal;
+  letter-spacing: 0;
+  cursor: auto;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.term.is-open .tip {
+  display: block;
+}
+
+.tip-title {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 0.98rem;
+}
+
+.tip-what {
+  display: block;
+  color: var(--ink-2);
+}
+
+.tip-how {
+  display: block;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--line);
+}
+
+.tip-how b {
+  margin-right: 8px;
+  color: var(--accent-ink);
+}
+
+.hint {
+  margin: 4px 0 0;
+  color: var(--ink-3);
+  font-size: 0.9rem;
+}
+
+/* ── 自治体ページ ── */
+
+.crumbs {
+  margin: 8px 0 4px;
+  color: var(--ink-3);
+  font-size: 0.95rem;
+}
+
+.crumbs a {
+  text-decoration: none;
+}
+
+.title-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.entity-name {
+  font-size: 3rem;
+}
+
+.entity-pref {
+  margin-left: 16px;
+  color: var(--ink-2);
+  font-size: 1.4rem;
+  font-weight: 400;
+}
+
+.btn-link {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--accent-ink);
+  font: inherit;
+  font-size: 0.95rem;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.figures {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin: 24px 0 0;
+  padding: 24px 0;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+
+.figures > div {
+  padding: 0 24px;
+  border-left: 1px solid var(--line);
+}
+
+.figures > div:first-child {
+  padding-left: 0;
+  border-left: 0;
+}
+
+.figures dt {
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.figures dd {
+  margin: 6px 0 0;
+  font-size: 1.9rem;
+  font-weight: 700;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.figures dd.sub {
+  margin-top: 4px;
+  color: var(--ink-3);
+  font-size: 0.9rem;
+  font-weight: 400;
+}
+
+.unit {
+  font-size: 0.55em;
+  margin: 0 0.05em;
+}
+
+.formula {
+  margin-left: 10px;
+  color: var(--ink-3);
+  font-size: 0.85rem;
+  font-weight: 400;
+}
+
+.reference {
+  margin: 16px 0 0;
+  font-size: 1.05rem;
+}
+
+.reference strong {
+  margin-left: 8px;
+}
+
+.note {
+  margin: 8px 0 0;
+  color: var(--ink-2);
+  font-size: 0.92rem;
+}
+
+.chart {
+  margin: 0;
+}
+
+.chart svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.chart .grid {
+  stroke: var(--line);
+}
+
+.chart .tick {
+  fill: var(--ink-3);
+  font-size: 13px;
+}
+
+.chart .line {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 2.5;
+  stroke-linejoin: round;
+}
+
+.chart .dot {
+  fill: var(--accent);
+}
+
+.chart figcaption {
+  margin-top: 4px;
+  color: var(--ink-2);
+  font-size: 0.92rem;
+}
+
+/* ── 並べ替え表 ── */
+
+.section-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.controls {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.seg {
+  display: inline-flex;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.seg button {
+  padding: 7px 14px;
+  border: 0;
+  background: #fff;
+  color: var(--ink-2);
+  font: inherit;
+  font-size: 0.92rem;
+  cursor: pointer;
+}
+
+.seg button + button {
+  border-left: 1px solid var(--line);
+}
+
+.seg button[aria-pressed="true"] {
+  background: var(--tile);
+  color: var(--accent-ink);
+  font-weight: 700;
+}
+
+.position {
+  margin: 0 0 12px;
+}
+
+.table-wrap {
+  overflow-x: auto;
+}
+
+.rank-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.rank-table th,
+.rank-table td {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  white-space: nowrap;
+}
+
+.rank-table th {
+  background: #f5f7fb;
+  color: var(--ink-2);
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.rank-table .num {
+  text-align: right;
+}
+
+.rank-table .rank {
+  width: 4.5em;
+  color: var(--ink-3);
+}
+
+.rank-table td a {
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.rank-table td a:hover {
+  color: var(--accent-ink);
+  text-decoration: underline;
+}
+
+.rank-table td a.t-pref {
+  margin-right: 8px;
+  color: var(--ink-3);
+  font-size: 0.9rem;
+}
+
+.rank-table td a.t-pref:hover {
+  color: var(--accent-ink);
+}
+
+.rank-table .strong {
+  font-weight: 700;
+}
+
+.rank-table tr.is-mine td {
+  background: var(--mine);
+}
+
+.btn-more {
+  display: block;
+  margin: 20px auto 0;
+  padding: 10px 24px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: #fff;
+  color: var(--ink-2);
+  font: inherit;
+  cursor: pointer;
+}
+
+.btn-more:hover {
+  border-color: #c3ccdb;
+  color: var(--ink);
+}
+
+/* ── データについて ── */
+
+.about-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.4fr;
+  gap: 40px;
+}
+
+.about p {
+  margin: 0 0 10px;
+  color: var(--ink-2);
+}
+
+.sources {
+  margin: 0;
+  padding-left: 1.2em;
+}
+
+.site-footer {
+  margin-top: 24px;
+  padding: 24px 0 40px;
+  border-top: 1px solid var(--line);
+  color: var(--ink-3);
+  font-size: 0.85rem;
+}
+
+.loading {
+  padding: 80px 0;
+  color: var(--ink-3);
+}
+
+/* ── スマホ幅 ── */
+
+@media (max-width: 760px) {
+  .wrap {
+    padding: 0 16px;
+  }
+  .header-inner {
+    height: auto;
+    padding: 12px 16px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+  .nav {
+    gap: 18px;
+  }
+  .hero {
+    padding: 28px 0 24px;
+  }
+  h1 {
+    font-size: 1.75rem;
+  }
+  .lead {
+    font-size: 1rem;
+  }
+  .search {
+    flex-direction: column;
+    gap: 8px;
+  }
+  .search input,
+  .search-lg input {
+    flex: none;
+    height: 52px;
+  }
+  .btn-primary {
+    height: 48px;
+  }
+  .map-wrap {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .pref-select {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 16px;
+    color: var(--ink-2);
+    font-size: 0.92rem;
+  }
+  .pref-select select {
+    height: 48px;
+    padding: 0 12px;
+    border: 1.5px solid #b9c6dd;
+    border-radius: 6px;
+    background: #fff;
+    color: var(--ink);
+    font: inherit;
+  }
+  .entity-name {
+    font-size: 2.1rem;
+  }
+  .entity-pref {
+    font-size: 1.05rem;
+    margin-left: 10px;
+  }
+  .figures {
+    grid-template-columns: 1fr 1fr;
+    row-gap: 20px;
+  }
+  .figures > div {
+    padding: 0 12px;
+  }
+  .figures > div:nth-child(odd) {
+    padding-left: 0;
+    border-left: 0;
+  }
+  .figures dd {
+    font-size: 1.12rem;
+  }
+  .col-opt2 {
+    display: none;
+  }
+  .formula {
+    display: block;
+    margin-left: 0;
+  }
+  .col-opt {
+    display: none;
+  }
+  .rank-table th,
+  .rank-table td {
+    padding: 8px 6px;
+  }
+  .t-pref {
+    display: block;
+    margin: 0;
+    font-size: 0.78rem;
+    line-height: 1.3;
+  }
+  .about-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+}
+
+/* 出典の長い URL はどこでも折り返す（スマホで横にはみ出さないように） */
+.site-footer p {
+  margin: 0 0 6px;
+}
+
+.site-footer a {
+  color: inherit;
+  overflow-wrap: anywhere;
+}
+
+/* ── v2: 1人あたり・普通交付税・募集費用の中身・控除を受けた住民 ── */
+
+.details {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0 32px;
+  margin-top: 24px;
+  border-top: 1px solid var(--line);
+}
+
+.detail {
+  padding: 20px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.detail-wide {
+  grid-column: 1 / -1;
+}
+
+.detail h3 {
+  margin: 0 0 6px;
+  font-size: 1rem;
+}
+
+.detail-value {
+  margin: 0;
+  font-size: 1.3rem;
+  font-weight: 700;
+}
+
+.detail-value small {
+  margin-left: 8px;
+  color: var(--ink-2);
+  font-size: 0.85rem;
+  font-weight: 400;
+}
+
+.detail-sub {
+  margin: 0 0 8px;
+  color: var(--ink-2);
+  font-size: 0.92rem;
+}
+
+.mini {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(7.5em, max-content));
+  justify-content: start;
+  gap: 4px 18px;
+  margin: 0;
+}
+
+.mini dt {
+  color: var(--ink-2);
+  font-size: 0.85rem;
+}
+
+.mini dd {
+  margin: 0;
+  font-size: 1.08rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.stack {
+  display: flex;
+  height: 18px;
+  margin: 8px 0 12px;
+  border-radius: 4px;
+  overflow: hidden;
+  background: var(--line);
+}
+
+.stack span {
+  display: block;
+  height: 100%;
+}
+
+.cost-list {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px 24px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.92rem;
+}
+
+.cost-list li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cost-list .amt {
+  margin-left: auto;
+  font-variant-numeric: tabular-nums;
+}
+
+.cost-list small {
+  display: inline-block;
+  min-width: 4.2em;
+  margin-left: 8px;
+  color: var(--ink-3);
+  text-align: right;
+}
+
+.portal {
+  margin: 14px 0 0;
+}
+
+.portal strong {
+  margin: 0 4px 0 8px;
+}
+
+/* 中間の幅では2列にし、募集費用の中身は全幅にする（1人あたりの金額が隣へはみ出さないように） */
+@media (max-width: 1100px) {
+  .figures {
+    grid-template-columns: 1fr 1fr;
+    row-gap: 20px;
+  }
+  .figures > div:nth-child(odd) {
+    padding-left: 0;
+    border-left: 0;
+  }
+  .details {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .cost-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .details {
+    grid-template-columns: 1fr;
+  }
+  .cost-list {
+    grid-template-columns: 1fr;
+  }
+  .mini {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 4px 10px;
+  }
+  .mini dd {
+    font-size: 0.98rem;
+  }
+}
+
+/* 上位10位以内の順位の印（数字の下に小さく） */
+.badges {
+  margin: 4px 0 0;
+}
+
+.badges:empty {
+  display: none;
+}
+
+.rank-badge {
+  display: inline-block;
+  margin: 2px 6px 0 0;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--tile);
+  color: var(--accent-ink);
+  font-size: 0.78rem;
+  font-weight: 700;
+  line-height: 1.6;
+  white-space: nowrap;
+}
+
+.reference .rank-badge,
+.portal .rank-badge {
+  margin-left: 8px;
+  vertical-align: 2px;
+}
+
+.figures dd.badges,
+.mini dd.badges {
+  font-size: 1rem;
+  font-weight: 400;
+  white-space: normal;
+}
+
+.rank-badge.is-minus {
+  background: #fde8e6;
+  color: #b3261e;
+}
+
+/* 狭い欄では印の中で折り返す（「全国4位（マイナスが大きい順）」が隣へはみ出さないように） */
+@media (max-width: 1100px) {
+  .rank-badge {
+    max-width: 100%;
+    white-space: normal;
+  }
+}
+
+/* 都道府県のページのタブ */
+.details-common {
+  margin-top: 16px;
+}
+
+.tabs {
+  display: flex;
+  gap: 4px;
+  margin-top: 32px;
+  border-bottom: 2px solid var(--line);
+}
+
+.tabs button {
+  margin-bottom: -2px;
+  padding: 12px 22px;
+  border: 0;
+  border-bottom: 3px solid transparent;
+  background: none;
+  color: var(--ink-2);
+  font: inherit;
+  font-size: 1.05rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.tabs button:hover {
+  color: var(--ink);
+}
+
+.tabs button[aria-selected="true"] {
+  border-bottom-color: var(--accent);
+  color: var(--accent-ink);
+}
+
+.tabs button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+.tab-panel > .section:first-child {
+  border-top: 0;
+  padding-top: 24px;
+}
+
+.tab-panel > .note:first-child {
+  margin-top: 20px;
+}
+
+@media (max-width: 760px) {
+  .tabs button {
+    flex: 1;
+    padding: 12px 8px;
+    font-size: 0.98rem;
+  }
+}

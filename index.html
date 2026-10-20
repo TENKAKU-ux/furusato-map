@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ふるさと納税マップ</title>
+    <meta name="description" content="ふるさと納税の受入額・募集費用・住民税控除額を、総務省の公表値で自治体ごとに確かめられます。" />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' rx='3' fill='%231d5fd6'/%3E%3C/svg%3E" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=BIZ+UDPGothic:wght@400;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="./src/style.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="wrap header-inner">
+        <a class="logo" href="#">ふるさと納税マップ</a>
+        <nav class="nav">
+          <a href="#" data-nav="search">自治体を調べる</a>
+          <a href="#" data-nav="ranking">全国の一覧</a>
+          <a href="#" data-nav="about">データについて</a>
+        </nav>
+      </div>
+    </header>
+    <main id="app" class="wrap"><p class="loading">データを読み込んでいます…</p></main>
+    <footer class="site-footer">
+      <div class="wrap" id="footer"></div>
+    </footer>
+    <script type="module" src="./src/main.ts"></script>
+  </body>
+</html>
