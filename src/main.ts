@@ -1,8 +1,10 @@
 import type { EntityKind, FurusatoData, FurusatoEntity, ReceiptHistoryPoint } from "./data-contract";
 import { axisYen, count, fiscalYearLabel, people, percent, perPersonYen, signedYen, yen } from "./format";
 import { chartGeometry, divide, parseHash, perCapita, rankAmong, rankOf, ranking, search, toHash, type Metric, type Mode, type Order, type Route } from "./logic";
+import { createAgentTools } from "./agent-tools";
 import { GLOSSARY, type TermKey } from "./glossary";
 import { bindMapLabel, fillPrefMap, metricButtons, nationalMap, PREF_NAMES, type MapMetric } from "./map";
+import { registerAgentTools } from "./webmcp";
 
 const app = document.getElementById("app")!;
 const footer = document.getElementById("footer")!;
@@ -733,6 +735,9 @@ async function main() {
     else window.scrollTo(0, 0);
   });
   enter();
+  // エージェント向けのツール（WebMCP）。最初の描画が済んでから登録し、失敗しても画面には影響させない
+  const modelContext = (document as Document & { modelContext?: unknown }).modelContext;
+  void registerAgentTools(createAgentTools(data, location.href.split("#")[0]), modelContext).then((ac) => import.meta.hot?.dispose(() => ac?.abort()));
   // 幅が変わったら（画面の回転など）グラフを描き直す。入力中の検索欄は消さない
   let width = app.clientWidth;
   let timer = 0;

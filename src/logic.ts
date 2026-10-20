@@ -33,6 +33,8 @@ export function search(entities: FurusatoEntity[], query: string, limit = 12): F
 // ── 並べ替え表 ──
 
 export type Metric = "primaryBalanceYen" | "referenceBalanceYen";
+/** 順位を付けられる値（画面の表は差額の2つ、エージェント向けのツールは受入額・控除額も使う） */
+export type RankingMetric = Metric | "receiptAmountYen" | "residentTaxDeductionYen";
 export type Order = "desc" | "asc";
 
 export interface RankedRow {
@@ -48,7 +50,7 @@ export interface RankedRow {
 export function ranking(
   entities: FurusatoEntity[],
   kind: EntityKind,
-  metric: Metric,
+  metric: RankingMetric,
   order: Order,
   prefName?: string,
   mode: Mode = "total",
@@ -194,7 +196,7 @@ export const perCapita = (amountYen: number | null, population: number | null) =
 export type Mode = "total" | "perCapita";
 
 /** 表示・地図・順位に使う値。「総額」ならそのまま、「1人あたり」なら人口で割る。 */
-export function valueOf(e: FurusatoEntity, metric: Metric | "receiptAmountYen" | "residentTaxDeductionYen", mode: Mode): number | null {
+export function valueOf(e: FurusatoEntity, metric: RankingMetric, mode: Mode): number | null {
   return mode === "perCapita" ? perCapita(e[metric], e.population) : e[metric];
 }
 

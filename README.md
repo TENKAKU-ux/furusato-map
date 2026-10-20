@@ -16,6 +16,11 @@ https://tenkaku-ux.github.io/furusato-map/
 
 列の対応・丸め・検証の記録は [docs/data.md](docs/data.md) にあります。
 
+## エージェントから使う
+
+- **WebMCP**: [WebMCP](https://webmachinelearning.github.io/webmcp/)（`document.modelContext`）に対応したブラウザでは、ページを開くと読み取り専用のツール `furusato_search_entities`・`furusato_get_entity`・`furusato_get_ranking` が登録されます（`src/agent-tools.ts`）。WebMCP はまだドラフトの実験的な API です。Chrome 154 で `--enable-features=WebMCP` を付けて、登録・発見・実行まで確かめています。
+- **静的なデータ**: ブラウザの外からは `data/furusato.json` をそのまま読めます。項目の意味と注記は [`llms.txt`](public/llms.txt) にあります。
+
 ## 動かす
 
 ```sh
