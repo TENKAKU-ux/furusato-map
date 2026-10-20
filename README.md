@@ -20,7 +20,7 @@ https://tenkaku-ux.github.io/furusato-map/
 
 Claude Code・Codex・Claude Desktop・Cursor などの AI エージェントから、このサイトのデータを調べられます。ツールはすべて読み取り専用で、概要・検索・取得・比較・一覧・順位・用語の7つです（`src/agent-tools.ts`）。
 
-- **MCP サーバー**: npm パッケージ `furusato-map-mcp`（[`mcp/`](mcp/README.md)）。データを同梱した stdio のサーバーで、起動したあとはネットワークに出ません。Claude Code なら `claude mcp add furusato-map -- npx -y furusato-map-mcp@0.1.0` で入ります。
+- **MCP サーバー**: [`mcp/`](mcp/README.md)。データを同梱した stdio のサーバーで、起動したあとはネットワークに出ません。このリポを clone して `mcp/` でビルドし、`node mcp/dist/server.mjs` をエージェントに登録します（手順は [mcp/README.md](mcp/README.md)）。
 - **WebMCP**: [WebMCP](https://webmachinelearning.github.io/webmcp/)（`document.modelContext`）に対応したブラウザでは、ページを開くと同じ7つのツールが登録されます。WebMCP はまだドラフトの実験的な API です。Chrome 154 で `--enable-features=WebMCP` を付けて、登録・発見・実行まで確かめています。
 - **静的なデータ**: `data/furusato.json` をそのまま読めます。項目の意味と注記は [`llms.txt`](public/llms.txt) にあります。
 

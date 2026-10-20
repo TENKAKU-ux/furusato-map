@@ -1,6 +1,6 @@
 # ふるさと納税マップ
 
-> 自治体ごとのふるさと納税の受入額・募集費用・住民税控除額などを、総務省の公表値を加工して見られる静的サイトです。個人が作成した非公式のサイトで、総務省・国土地理院とは関係ありません。このサイト自体は MCP サーバーではありません。エージェントから使うための stdio の MCP サーバーは、別に npm パッケージ `furusato-map-mcp` として用意しています（下の「MCP サーバー」）。
+> 自治体ごとのふるさと納税の受入額・募集費用・住民税控除額などを、総務省の公表値を加工して見られる静的サイトです。個人が作成した非公式のサイトで、総務省・国土地理院とは関係ありません。このサイト自体は MCP サーバーではありません。エージェントから使うための stdio の MCP サーバーは、GitHub のリポに別に用意しています（下の「MCP サーバー」）。
 
 ## データ
 
@@ -32,9 +32,9 @@ WebMCP（`document.modelContext`、W3C Web Machine Learning CG のドラフト�
 
 同じ7つのツールと、読み物 `furusato://guide`・`furusato://glossary`・`furusato://metadata` を持つ stdio の MCP サーバーです。データを同梱していて、起動したあとはネットワークに出ません。Node.js 20 以上で動きます。
 
-- Claude Code: `claude mcp add furusato-map -- npx -y furusato-map-mcp@0.1.0`
-- そのほかのクライアント: コマンド `npx`、引数 `["-y", "furusato-map-mcp@0.1.0"]`
-- ソースと説明: https://github.com/TENKAKU-ux/furusato-map/tree/main/mcp
+- 入れ方: `git clone https://github.com/TENKAKU-ux/furusato-map.git` のあと、`furusato-map/mcp` で `npm ci` と `npm run build` を実行し、コマンド `node`、引数 `[<clone した場所>/mcp/dist/server.mjs の絶対パス]` で登録する
+- Claude Code（`furusato-map/mcp` の中で）: `claude mcp add --scope user furusato-map -- node "$PWD/dist/server.mjs"`
+- 手順の詳細: https://github.com/TENKAKU-ux/furusato-map/tree/main/mcp
 
 ## 出典
 

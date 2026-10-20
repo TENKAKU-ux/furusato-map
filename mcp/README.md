@@ -6,20 +6,29 @@
 
 ## 入れ方
 
-Node.js 20 以上が要ります。下の例は版を固定しています（`@0.1.0`）。
-
-**Claude Code**
+Node.js 20 以上と git が要ります。今は npm には公開していないので、GitHub から取ってきて、自分の PC でビルドします。
 
 ```sh
-claude mcp add furusato-map -- npx -y furusato-map-mcp@0.1.0
+git clone https://github.com/TENKAKU-ux/furusato-map.git
+cd furusato-map/mcp
+npm ci
+npm run build
+```
+
+できた `dist/server.mjs` を、使うエージェントに登録します。下の例の `/path/to/furusato-map` は、clone した場所の絶対パスに置き換えてください。
+
+**Claude Code**（`furusato-map/mcp` の中で）
+
+```sh
+claude mcp add --scope user furusato-map -- node "$PWD/dist/server.mjs"
 ```
 
 **Codex**（`~/.codex/config.toml`）
 
 ```toml
 [mcp_servers.furusato-map]
-command = "npx"
-args = ["-y", "furusato-map-mcp@0.1.0"]
+command = "node"
+args = ["/path/to/furusato-map/mcp/dist/server.mjs"]
 ```
 
 **Claude Desktop・Cursor など**（設定の JSON）
@@ -27,12 +36,12 @@ args = ["-y", "furusato-map-mcp@0.1.0"]
 ```json
 {
   "mcpServers": {
-    "furusato-map": { "command": "npx", "args": ["-y", "furusato-map-mcp@0.1.0"] }
+    "furusato-map": { "command": "node", "args": ["/path/to/furusato-map/mcp/dist/server.mjs"] }
   }
 }
 ```
 
-`npx` は初回にパッケージを npm から取得し、npm のキャッシュに保存します。起動したあとのサーバーは、同梱のデータを読むだけで、ネットワークへの接続・ファイルの書き込み・ほかのプログラムの起動をしません。
+ビルドのときだけ、npm から依存（MCP の SDK とビルド用の道具）を取ってきます。起動したあとのサーバーは、同梱のデータを読むだけで、ネットワークへの接続・ファイルの書き込み・ほかのプログラムの起動をしません。新しい版が出たら、`git pull` してから `npm ci` と `npm run build` をやり直してください。
 
 ## できること
 
