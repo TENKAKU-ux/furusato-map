@@ -1,0 +1,23 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.TENKAKU-ux/furusato-map",
+  "title": "ふるさと納税マップ",
+  "description": "Read-only furusato nozei (hometown tax) data for Japanese municipalities, from MIC statistics.",
+  "version": "0.1.0",
+  "websiteUrl": "https://tenkaku-ux.github.io/furusato-map/",
+  "repository": {
+    "url": "https://github.com/TENKAKU-ux/furusato-map",
+    "source": "github",
+    "subfolder": "mcp"
+  },
+  "packages": [
+    {
+      "registryType": "npm",
+      "identifier": "furusato-map-mcp",
+      "version": "0.1.0",
+      "transport": {
+        "type": "stdio"
+      }
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 # ふるさと納税マップ
 
-> 自治体ごとのふるさと納税の受入額・募集費用・住民税控除額などを、総務省の公表値を加工して見られる静的サイトです。個人が作成した非公式のサイトで、総務省・国土地理院とは関係ありません。このサイトは MCP サーバーではありません。
+> 自治体ごとのふるさと納税の受入額・募集費用・住民税控除額などを、総務省の公表値を加工して見られる静的サイトです。個人が作成した非公式のサイトで、総務省・国土地理院とは関係ありません。このサイト自体は MCP サーバーではありません。エージェントから使うための stdio の MCP サーバーは、別に npm パッケージ `furusato-map-mcp` として用意しています（下の「MCP サーバー」）。
 
 ## データ
 
@@ -18,11 +18,23 @@
 
 WebMCP（`document.modelContext`、W3C Web Machine Learning CG のドラフト）に対応したブラウザでは、ページを開くと次の読み取り専用のツールが登録されます。実験的な API なので、ブラウザや版によっては使えません。
 
+- `furusato_get_overview` {}: 最初に呼ぶ入口。使い分け・指標の意味と単位・時点・全国計・データの版
 - `furusato_search_entities` {query, limit?}: 名前で自治体を探し、団体コードを返す
-- `furusato_get_entity` {code}: 団体コードで数値を返す（人口1人あたりなどの派生値つき）
+- `furusato_get_entity` {code}: 団体コードで数値と推移を返す（人口1人あたりなどの派生値つき）
+- `furusato_compare_entities` {codes}: 2〜10の自治体を並べる（同じ区分どうし）
+- `furusato_list_entities` {kind, prefName?, offset?, limit?}: 全国または県内の自治体を団体コード順にページに分けて返す
 - `furusato_get_ranking` {kind, metric, order, mode, prefName?, limit?}: 受入額・住民税控除額・差額・参考差額の順位（総額か人口1人あたり）
+- `furusato_explain_term` {term?}: 用語の意味と見方
 
 結果は `{ok: true, data, metadata}` か `{ok: false, error: {code, message}}` で、`metadata` に単位・時点・注記・出典が毎回付きます。
+
+## MCP サーバー（stdio）
+
+同じ7つのツールと、読み物 `furusato://guide`・`furusato://glossary`・`furusato://metadata` を持つ stdio の MCP サーバーです。データを同梱していて、起動したあとはネットワークに出ません。Node.js 20 以上で動きます。
+
+- Claude Code: `claude mcp add furusato-map -- npx -y furusato-map-mcp@0.1.0`
+- そのほかのクライアント: コマンド `npx`、引数 `["-y", "furusato-map-mcp@0.1.0"]`
+- ソースと説明: https://github.com/TENKAKU-ux/furusato-map/tree/main/mcp
 
 ## 出典
 

@@ -6,3 +6,5 @@ __pycache__/
 # 元データの原本は公開リポに含めない（取得先と SHA-256 は data-pipeline/raw/README.md と docs/data.md）
 data-pipeline/raw/*.xlsx
 data-pipeline/raw/*.pdf
+# stdio サーバーのデータはビルドで public/data から写す
+mcp/data/

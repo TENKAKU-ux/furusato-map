@@ -1,9 +1,10 @@
-// エージェント向けのツール（WebMCP で登録する）。読み取り専用で、画面と同じ計算（logic.ts）を使う。
+// エージェント向けのツール（WebMCP と stdio の MCP サーバーで登録する）。読み取り専用で、画面と同じ計算（logic.ts）を使う。
 // 結果は成功 {ok:true, data, metadata}、入力の誤り {ok:false, error}。金額は整数の円、欠測は null のまま返す。
 import type { EntityKind, FurusatoData, FurusatoEntity } from "./data-contract";
+import { GLOSSARY, type TermKey } from "./glossary";
 import { divide, perCapita, ranking, search, toHash, type Mode, type Order, type RankingMetric } from "./logic";
 
-export const TOOLS_VERSION = 1;
+export const TOOLS_VERSION = 2;
 
 const SOURCE_PAGE = "https://www.soumu.go.jp/main_sosiki/jichi_zeisei/czaisei/czaisei_seido/furusato/archive/";
 
@@ -77,8 +78,44 @@ function checkKeys(input: unknown, allowed: string[], required: string[]): strin
 const isInt = (v: unknown, min: number, max: number): v is number => typeof v === "number" && Number.isInteger(v) && v >= min && v <= max;
 const oneOf = <T extends string>(v: unknown, list: readonly T[]): v is T => typeof v === "string" && (list as readonly string[]).includes(v);
 
-/** 3つのツールを作る。siteUrl はサイトの URL（hash なし）で、各結果に付けるページの URL の基準にする。 */
-export function createAgentTools(data: FurusatoData, siteUrl: string): AgentTool[] {
+/** データの識別子。stdio のサーバーは同梱 JSON の SHA256 と自分の版を渡す。ブラウザでは null。 */
+export interface DatasetInfo {
+  datasetSha256?: string | null;
+  serverVersion?: string | null;
+}
+
+const TERM_KEYS = Object.keys(GLOSSARY) as TermKey[];
+
+/** 全国計を足す範囲。県の受入・控除は県自身の分なので市区町村と重ならない。人口・控除を受けた住民は県の値が県内の和なので市区町村だけ足す。 */
+const NATIONAL_TOTALS = [
+  { key: "receiptAmountYen", label: "受入額", scope: "all" },
+  { key: "receiptCount", label: "受入件数", scope: "all" },
+  { key: "proxyReceiptAmountYen", label: "うち代理受入", scope: "all" },
+  { key: "solicitationCostYen", label: "募集費用", scope: "all" },
+  { key: "portalCostYen", label: "うちポータル事業者への支払額", scope: "all" },
+  { key: "residentTaxDeductionYen", label: "住民税控除額（市町村民税＋道府県民税）", scope: "all" },
+  { key: "population", label: "人口", scope: "municipality" },
+  { key: "deductionUserCount", label: "控除を受けた住民", scope: "municipality" },
+  { key: "deductionDonationAmountYen", label: "控除を受けた住民の寄附額", scope: "municipality" },
+] as const;
+
+/** 派生値。get_entity と compare で同じものを返す。 */
+function derive(e: FurusatoEntity) {
+  return {
+    perCapita: {
+      receiptAmountYen: perCapita(e.receiptAmountYen, e.population),
+      residentTaxDeductionYen: perCapita(e.residentTaxDeductionYen, e.population),
+      primaryBalanceYen: perCapita(e.primaryBalanceYen, e.population),
+      referenceBalanceYen: perCapita(e.referenceBalanceYen, e.population),
+    },
+    solicitationCostShareOfReceipt: divide(e.solicitationCostYen, e.receiptAmountYen),
+    deductionUserShareOfPopulation: divide(e.deductionUserCount, e.population),
+    averageDonationPerDeductionUserYen: divide(e.deductionDonationAmountYen, e.deductionUserCount),
+  };
+}
+
+/** 7つのツールを作る。siteUrl はサイトの URL（hash なし）で、各結果に付けるページの URL の基準にする。 */
+export function createAgentTools(data: FurusatoData, siteUrl: string, dataset: DatasetInfo = {}): AgentTool[] {
   const metadata = buildMetadata(data, siteUrl);
   const byCode = new Map(data.entities.map((e) => [e.code, e]));
   const prefNames = data.entities.filter((e) => e.kind === "prefecture").map((e) => e.name);
@@ -131,21 +168,7 @@ export function createAgentTools(data: FurusatoData, siteUrl: string): AgentTool
       if (typeof code !== "string" || !/^[0-9]{6}$/.test(code)) return invalid("code は6桁の数字の文字列にしてください。");
       const e = byCode.get(code);
       if (!e) return { ok: false, error: { code: "NOT_FOUND", message: `団体コード ${code} は見つかりません。` } };
-      return ok({
-        entity: e,
-        derived: {
-          perCapita: {
-            receiptAmountYen: perCapita(e.receiptAmountYen, e.population),
-            residentTaxDeductionYen: perCapita(e.residentTaxDeductionYen, e.population),
-            primaryBalanceYen: perCapita(e.primaryBalanceYen, e.population),
-            referenceBalanceYen: perCapita(e.referenceBalanceYen, e.population),
-          },
-          solicitationCostShareOfReceipt: divide(e.solicitationCostYen, e.receiptAmountYen),
-          deductionUserShareOfPopulation: divide(e.deductionUserCount, e.population),
-          averageDonationPerDeductionUserYen: divide(e.deductionDonationAmountYen, e.deductionUserCount),
-        },
-        url: url(e),
-      });
+      return ok({ entity: e, derived: derive(e), url: url(e) });
     },
   };
 
@@ -192,5 +215,194 @@ export function createAgentTools(data: FurusatoData, siteUrl: string): AgentTool
     },
   };
 
-  return [searchTool, getTool, rankingTool];
+  const counts = {
+    prefecture: data.entities.filter((e) => e.kind === "prefecture").length,
+    municipality: data.entities.filter((e) => e.kind === "municipality").length,
+  };
+  const nationalTotals = NATIONAL_TOTALS.map(({ key, label, scope }) => {
+    const rows = data.entities.filter((e) => scope === "all" || e.kind === scope);
+    const values = rows.map((e) => e[key]);
+    return {
+      key,
+      label,
+      value: values.reduce<number>((sum, v) => sum + (v ?? 0), 0),
+      missingCount: values.filter((v) => v === null).length,
+      summedOver:
+        scope === "all"
+          ? `都道府県${counts.prefecture}と市区町村${counts.municipality}の計${rows.length}団体`
+          : `市区町村${rows.length}団体だけ（都道府県の値は県内の市区町村の合計なので足さない）`,
+    };
+  });
+
+  const overviewTool: AgentTool = {
+    name: "furusato_get_overview",
+    title: "サイトとデータの概要を見る",
+    description:
+      "最初に呼ぶ入口です。サイトの説明、問いに合うツールの選び方、指標の意味と単位、時点、全国計、データの版と注記・出典を返します。入力はありません。",
+    inputSchema: { type: "object", properties: {}, additionalProperties: false },
+    annotations: { readOnlyHint: true },
+    execute(input) {
+      const bad = checkKeys(input, [], []);
+      if (bad) return invalid(bad);
+      return ok({
+        about:
+          "自治体ごとのふるさと納税の受入額・募集費用・住民税控除額などを、総務省などの公表値を加工してまとめたデータです。個人が作成した非公式のもので、総務省・国土地理院とは関係ありません。",
+        howToUse: [
+          { question: "自治体の団体コードを知りたい（名前しか分からない）", tool: "furusato_search_entities" },
+          { question: "ある自治体の数値・推移を詳しく知りたい", tool: "furusato_get_entity" },
+          { question: "いくつかの自治体を並べて比べたい", tool: "furusato_compare_entities" },
+          { question: "受入額などの多い順・少ない順を知りたい", tool: "furusato_get_ranking" },
+          { question: "ある都道府県の市区町村、または全国を全部見たい", tool: "furusato_list_entities" },
+          { question: "用語（差額・募集費用・普通交付税など）の意味を知りたい", tool: "furusato_explain_term" },
+        ],
+        metrics: {
+          receiptAmountYen: { label: "受入額", unit: "円", period: "receipts", meaning: GLOSSARY.receipt.what },
+          receiptCount: { label: "受入件数", unit: "件", period: "receipts", meaning: "受入額の件数です。" },
+          proxyReceiptAmountYen: { label: "うち代理受入", unit: "円", period: "receipts", meaning: GLOSSARY.proxy.what },
+          solicitationCostYen: { label: "募集費用", unit: "円", period: "receipts", meaning: GLOSSARY.cost.what },
+          portalCostYen: { label: "うちポータル事業者への支払額", unit: "円", period: "receipts", meaning: GLOSSARY.portal.what },
+          residentTaxDeductionYen: {
+            label: "住民税控除額",
+            unit: "円",
+            period: "deductions",
+            meaning: `市区町村では、${GLOSSARY.deduction.what} 都道府県では、${GLOSSARY.deductionPref.what}`,
+          },
+          primaryBalanceYen: { label: "差額", unit: "円", period: "receipts と deductions", meaning: GLOSSARY.balance.what },
+          referenceBalanceYen: { label: "参考差額", unit: "円", period: "receipts と deductions", meaning: GLOSSARY.reference.what },
+          population: { label: "人口", unit: "人", period: "population", meaning: "住民基本台帳人口（日本人と外国人の合計）です。" },
+          ordinaryGrantStatus: { label: "普通交付税の状態", unit: null, period: "ordinaryGrant", meaning: GLOSSARY.ordinaryGrant.what },
+          deductionUserCount: { label: "控除を受けた住民", unit: "人", period: "deductions", meaning: GLOSSARY.deductionUsers.what },
+          deductionDonationAmountYen: { label: "控除を受けた住民の寄附額", unit: "円", period: "deductions", meaning: "控除を受けた住民の寄附の合計です。" },
+          history: { label: "受入額の推移", unit: "円", period: "history", meaning: GLOSSARY.history.what },
+        },
+        counts,
+        nationalTotals: {
+          note: "受入額は代理受入を含む値で、総務省の公表する全国計と一致します。全国の差額は、期間のずれと地方交付税・所得税の控除を含まないことから誤読されやすいため出していません。missingCount は値が null（欠測）で合計に入れなかった団体の数です。",
+          values: nationalTotals,
+        },
+        dataset: {
+          schemaVersion: data.metadata.schemaVersion,
+          sha256: dataset.datasetSha256 ?? null,
+          serverVersion: dataset.serverVersion ?? null,
+          snapshot: "公表資料から作った固定のデータで、自動では更新されません。時点は metadata.periods にあります。",
+        },
+      });
+    },
+  };
+
+  const compareTool: AgentTool = {
+    name: "furusato_compare_entities",
+    title: "自治体を並べて比べる",
+    description:
+      "2〜10の団体コードで、同じ項目を並べて返します（推移は含みません。推移は furusato_get_entity で取ります）。市区町村と都道府県は値の意味が違うので、同じ区分どうしでだけ比べられます。",
+    inputSchema: {
+      type: "object",
+      properties: {
+        codes: {
+          type: "array",
+          items: { type: "string", pattern: "^[0-9]{6}$" },
+          minItems: 2,
+          maxItems: 10,
+          uniqueItems: true,
+          description: "6桁の団体コード（先頭の0を含む）を2〜10個。同じ区分（市区町村どうし、または都道府県どうし）だけ",
+        },
+      },
+      required: ["codes"],
+      additionalProperties: false,
+    },
+    annotations: { readOnlyHint: true },
+    execute(input) {
+      const bad = checkKeys(input, ["codes"], ["codes"]);
+      if (bad) return invalid(bad);
+      const { codes } = input as { codes: unknown };
+      if (!Array.isArray(codes) || codes.length < 2 || codes.length > 10) return invalid("codes は2〜10個の配列にしてください。");
+      if (!codes.every((c): c is string => typeof c === "string" && /^[0-9]{6}$/.test(c))) return invalid("codes の要素は6桁の数字の文字列にしてください。");
+      if (new Set(codes).size !== codes.length) return invalid("codes に同じコードが重なっています。");
+      const missing = codes.filter((c) => !byCode.has(c));
+      if (missing.length) return { ok: false, error: { code: "NOT_FOUND", message: `団体コード ${missing.join(", ")} は見つかりません。` } };
+      const entities = codes.map((c) => byCode.get(c)!);
+      if (new Set(entities.map((e) => e.kind)).size > 1) return invalid("市区町村と都道府県は値の意味が違うので、同じ区分どうしで比べてください。");
+      return ok({
+        kind: entities[0].kind,
+        items: entities.map((e) => {
+          const { history: _history, ...rest } = e;
+          return { entity: rest, derived: derive(e), url: url(e) };
+        }),
+      });
+    },
+  };
+
+  const listTool: AgentTool = {
+    name: "furusato_list_entities",
+    title: "自治体を一覧で取る",
+    description:
+      "市区町村または都道府県を団体コード順に、主要な値つきでページに分けて返します。prefName を付けると、その都道府県の市区町村だけです（kind が municipality のときだけ）。続きは nextOffset を offset に渡して取ります。値が null の団体も除かずに返します。",
+    inputSchema: {
+      type: "object",
+      properties: {
+        kind: { type: "string", enum: KINDS, description: "municipality＝市区町村、prefecture＝都道府県" },
+        prefName: { type: "string", enum: prefNames, description: "都道府県名（例: 北海道）。kind が municipality のときだけ" },
+        offset: { type: "integer", minimum: 0, default: 0 },
+        limit: { type: "integer", minimum: 1, maximum: 100, default: 50 },
+      },
+      required: ["kind"],
+      additionalProperties: false,
+    },
+    annotations: { readOnlyHint: true },
+    execute(input) {
+      const bad = checkKeys(input, ["kind", "prefName", "offset", "limit"], ["kind"]);
+      if (bad) return invalid(bad);
+      const { kind, prefName, offset = 0, limit = 50 } = input as Record<string, unknown>;
+      if (!oneOf(kind, KINDS)) return invalid(`kind は ${KINDS.join(" / ")} のどれかにしてください。`);
+      if (prefName !== undefined) {
+        if (!oneOf(prefName, prefNames)) return invalid("prefName は47都道府県の正式な名前（例: 北海道）にしてください。");
+        if (kind === "prefecture") return invalid("prefName は kind が municipality のときだけ使えます。");
+      }
+      if (!isInt(offset, 0, Number.MAX_SAFE_INTEGER)) return invalid("offset は0以上の整数にしてください。");
+      if (!isInt(limit, 1, 100)) return invalid("limit は1〜100の整数にしてください。");
+      const all = data.entities
+        .filter((e) => e.kind === kind && (!prefName || e.prefName === prefName))
+        .sort((a, b) => a.code.localeCompare(b.code));
+      const page = all.slice(offset, offset + limit);
+      const hasMore = offset + page.length < all.length;
+      return ok({
+        conditions: { kind, prefName: prefName ?? null, offset, limit },
+        total: all.length,
+        hasMore,
+        nextOffset: hasMore ? offset + page.length : null,
+        rows: page.map((e) => ({
+          ...brief(e),
+          receiptAmountYen: e.receiptAmountYen,
+          solicitationCostYen: e.solicitationCostYen,
+          residentTaxDeductionYen: e.residentTaxDeductionYen,
+          primaryBalanceYen: e.primaryBalanceYen,
+          referenceBalanceYen: e.referenceBalanceYen,
+          population: e.population,
+        })),
+      });
+    },
+  };
+
+  const explainTool: AgentTool = {
+    name: "furusato_explain_term",
+    title: "用語の意味を見る",
+    description:
+      "サイトで使う用語（受入額・募集費用・住民税控除額・差額・参考差額・普通交付税など）の意味と見方を返します。term を省くと、使える用語の一覧を返します。",
+    inputSchema: {
+      type: "object",
+      properties: { term: { type: "string", enum: TERM_KEYS, description: "用語の key。省くと一覧" } },
+      additionalProperties: false,
+    },
+    annotations: { readOnlyHint: true },
+    execute(input) {
+      const bad = checkKeys(input, ["term"], []);
+      if (bad) return invalid(bad);
+      const { term } = input as { term?: unknown };
+      if (term === undefined) return ok({ terms: TERM_KEYS.map((key) => ({ key, title: GLOSSARY[key].title })) });
+      if (!oneOf(term, TERM_KEYS)) return invalid(`term は ${TERM_KEYS.join(" / ")} のどれかにしてください。`);
+      return ok({ key: term, ...GLOSSARY[term] });
+    },
+  };
+
+  return [overviewTool, searchTool, getTool, compareTool, listTool, rankingTool, explainTool];
 }

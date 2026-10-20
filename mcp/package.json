@@ -1,0 +1,51 @@
+{
+  "name": "furusato-map-mcp",
+  "version": "0.1.0",
+  "description": "日本の自治体ごとのふるさと納税（受入額・募集費用・住民税控除額など）を、総務省などの公表値で返す読み取り専用の MCP サーバー（非公式）",
+  "mcpName": "io.github.TENKAKU-ux/furusato-map",
+  "type": "module",
+  "bin": {
+    "furusato-map-mcp": "dist/server.mjs"
+  },
+  "files": [
+    "dist/server.mjs",
+    "data/furusato.json",
+    "README.md",
+    "LICENSE",
+    "DATA-LICENSE.md"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "vite build -c vite.config.ts",
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "node test/e2e.mjs",
+    "prepack": "npm run build"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "furusato-nozei",
+    "ふるさと納税",
+    "japan",
+    "open-data"
+  ],
+  "license": "MIT",
+  "homepage": "https://tenkaku-ux.github.io/furusato-map/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TENKAKU-ux/furusato-map.git",
+    "directory": "mcp"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/server": "2.3.1",
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "@modelcontextprotocol/client": "2.3.1",
+    "@types/node": "22.20.5",
+    "typescript": "5.8.3",
+    "vite": "6.4.4"
+  }
+}

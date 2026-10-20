@@ -10,7 +10,7 @@ https://tenkaku-ux.github.io/furusato-map/
 
 - 総務省「ふるさと納税に関する現況調査結果」（2026年7月31日公表）を加工して作成（公共データ利用規約 第1.0版）
 - 政府統計の総合窓口（e-Stat）「住民基本台帳に基づく人口、人口動態及び世帯数」（令和8年1月1日現在）を加工して作成（政府標準利用規約 第2.0版）
-- 総務省「令和8年度 市町村別普通交付税決定額」「令和8年度普通交付税大綱」を加工して作成
+- 総務省「令和8年度 市町村別普通交付税決定額」「令和8年度普通交付税大綱」を加工して作成（公共データ利用規約 第1.0版）
 - 国土地理院「地球地図日本」を、[jpn-atlas](https://github.com/biskwikman/jpn-atlas)（BSD 3-Clause License）経由で加工して作成（`public/licenses/`）
 - フォント BIZ UDPGothic（SIL Open Font License 1.1、`tools/fonts/OFL.txt`）
 
@@ -18,8 +18,11 @@ https://tenkaku-ux.github.io/furusato-map/
 
 ## エージェントから使う
 
-- **WebMCP**: [WebMCP](https://webmachinelearning.github.io/webmcp/)（`document.modelContext`）に対応したブラウザでは、ページを開くと読み取り専用のツール `furusato_search_entities`・`furusato_get_entity`・`furusato_get_ranking` が登録されます（`src/agent-tools.ts`）。WebMCP はまだドラフトの実験的な API です。Chrome 154 で `--enable-features=WebMCP` を付けて、登録・発見・実行まで確かめています。
-- **静的なデータ**: ブラウザの外からは `data/furusato.json` をそのまま読めます。項目の意味と注記は [`llms.txt`](public/llms.txt) にあります。
+Claude Code・Codex・Claude Desktop・Cursor などの AI エージェントから、このサイトのデータを調べられます。ツールはすべて読み取り専用で、概要・検索・取得・比較・一覧・順位・用語の7つです（`src/agent-tools.ts`）。
+
+- **MCP サーバー**: npm パッケージ `furusato-map-mcp`（[`mcp/`](mcp/README.md)）。データを同梱した stdio のサーバーで、起動したあとはネットワークに出ません。Claude Code なら `claude mcp add furusato-map -- npx -y furusato-map-mcp@0.1.0` で入ります。
+- **WebMCP**: [WebMCP](https://webmachinelearning.github.io/webmcp/)（`document.modelContext`）に対応したブラウザでは、ページを開くと同じ7つのツールが登録されます。WebMCP はまだドラフトの実験的な API です。Chrome 154 で `--enable-features=WebMCP` を付けて、登録・発見・実行まで確かめています。
+- **静的なデータ**: `data/furusato.json` をそのまま読めます。項目の意味と注記は [`llms.txt`](public/llms.txt) にあります。
 
 ## 動かす
 
@@ -32,4 +35,10 @@ npm run build    # dist/ に出力（SITE_URL を付けると共有カードも�
 
 `main` に push すると、GitHub Actions がビルドして GitHub Pages に公開します（`.github/workflows/pages.yml`）。
 
+MCP サーバーは `mcp/` で `npm ci`・`npm run build`・`npm test` です。公開前の確認（tgz をリポの外に展開し、読み取り専用・ネットワークなし・strace で動かす）は `mcp/test/verify-package.sh` です。
+
 データを作り直す手順は [data-pipeline/README.md](data-pipeline/README.md) と [data-pipeline/raw/README.md](data-pipeline/raw/README.md) にあります（Python 3.10 以上、標準ライブラリのみ）。
+
+## ライセンス
+
+コードは MIT（[LICENSE](LICENSE)）です。データ（`public/data/`）は上の出典の利用条件に従います。地図のもとになったデータ（jpn-atlas、BSD 3-Clause License）とフォント（SIL Open Font License 1.1）は、それぞれのライセンスに従います（`public/licenses/`、`tools/fonts/OFL.txt`）。
