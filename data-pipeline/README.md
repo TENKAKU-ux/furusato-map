@@ -6,7 +6,7 @@
 
 テスト：`python3 -m unittest discover -s data-pipeline -p 'test_*.py' -v`
 
-`raw/SHA256SUMS` のExcel5本とPDF2本を照合してから原票を読み、契約v2の `public/data/furusato.json` と `data-pipeline/validation.json` を生成する。取得日は2026-10-18。人口・交付税Excel・交付税大綱はCodexが公式URLから直接取得し、既存の調査3本と報道資料の取得日はClaudeの記録に基づく。報道資料は独立照合、大綱は普通交付税の状態の根拠に使う。入力のハッシュ不一致・コード重複/結合欠落・列定義変更・推移R7不一致・契約違反では失敗し、新しい出力を作らない。
+`raw/SHA256SUMS` のExcel5本とPDF2本を照合してから原票を読み、契約v2の `public/data/furusato.json` と `data-pipeline/validation.json` を生成する。取得日は2026-10-18。人口・交付税Excel・交付税大綱は作成者が公式URLから直接取得し、既存の調査3本と報道資料の取得日は作成者の取得記録に基づく。報道資料は独立照合、大綱は普通交付税の状態の根拠に使う。入力のハッシュ不一致・コード重複/結合欠落・列定義変更・推移R7不一致・契約違反では失敗し、新しい出力を作らない。
 
 `schema_check.py` は確定Schemaが使うDraft 2020-12のキーワードと `date` / `uri` 形式だけを検査する。未対応キーワードを検出したら失敗する。汎用のJSON Schemaエンジンではない。生成物は別途Draft 2020-12の汎用検証器でも照合する。
 

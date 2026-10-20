@@ -11,7 +11,7 @@ from build import PRESS_FILE, RAW, ROOT
 
 # 総務省「ふるさと納税に関する現況調査結果（令和8年度実施）」2026-07-31
 # https://www.soumu.go.jp/main_content/001085011.pdf
-# Claudeが2026-10-18に取得。ページ番号は資料の印字ページ（PDF物理ページは+1）。
+# 作成者が2026-10-18に取得。ページ番号は資料の印字ページ（PDF物理ページは+1）。
 # p.1留意事項: 表示単位未満を四捨五入。控除額は道府県民税と市町村民税の合計。
 PRESS_SHA256 = "1914ba1ba0f6b6171810e4ff4feab26115ebc4dd71b6d54070604cb27f9e0ed5"
 P2_RECEIPTS_OKU = Decimal("13314.3")
